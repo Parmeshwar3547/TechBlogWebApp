@@ -46,16 +46,23 @@ public class EditServlet extends HttpServlet {
             user.setName(userName);
             user.setEmail(userEmail);
             user.setPassword(userPassword);
+            String oldFile=user.getProfile();
             user.setProfile(imageName);
 
             //update data in database
             UserDao dao = new UserDao(ConnectionProvider.getConnection());
             boolean ans = dao.updateUser(user);
             if (ans) {
-
+                //new profile photo path
                 String path = request.getServletContext().getRealPath("/") + "profile" + File.separator + user.getProfile();
                 out.println(path);
-                //Helper.deleteFile(path);
+                
+                //Delete old profile photo
+                String pathOld = request.getServletContext().getRealPath("/") + "profile" + File.separator + oldFile;
+                if(!oldFile.equals("default.png")){
+                Helper.deleteFile(pathOld);
+                }
+                
                 if (Helper.saveFile(part.getInputStream(), path)) {
                     
                     Message msg = new Message("Profile Updated ", "success", "alert-success");
