@@ -1,73 +1,49 @@
 
 package com.tech.blog.servlets;
 
+import com.tech.blog.helper.ConnectionProvider;
 import com.tech.blog.dao.UserDao;
 import com.tech.blog.entities.User;
-import com.tech.blog.helper.ConnectionProvider;
-import com.tech.blog.helper.Helper;
-import jakarta.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.Part;
-import java.io.File;
 
 @MultipartConfig
-public class EditServlet extends HttpServlet {
+public class RegisterServlet extends HttpServlet {
 
-   
+  
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet EditServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-       
-//            fetch all data
-            String userEmail = request.getParameter("user_email");
-            String userName = request.getParameter("user_name");
-            String userPassword = request.getParameter("user_password");
-            //uploading img using servlet
-            Part part = request.getPart("image");
-            String imageName = part.getSubmittedFileName();
-            
-            //get user from session
-            HttpSession httpSession = request.getSession();
-           User user= (User) httpSession.getAttribute("currentUser");
            
-           user.setName(userName);
-           user.setEmail(userEmail);
-           user.setPassword(userPassword);
-           user.setProfile(imageName);
+        String check = request.getParameter("check");
+        if(check==null){
+            out.println("Accept terms and conditions!");
+        }else{
+            String name =request.getParameter("user_name");
+            String email = request.getParameter("user_email");
+            String password = request.getParameter("user_password");
+            String gender = request.getParameter("gender");
+            
+//            create User object and set all data to that obj
+         User user= new User(name,email,password,gender);
+            
+//            create UserDao object
+            UserDao dao = new UserDao(ConnectionProvider.getConnection());
+           if(dao.saveUser(user)){
+//               save
+            out.println("done");
+           }else{
+               out.print("Error");
+           }
+        }
            
-           //update data in database
-           UserDao dao = new UserDao(ConnectionProvider.getConnection());
-            boolean ans = dao.updateUser(user);
-            if (ans) {
-                out.println("Update Successsfully");
-            
-                String path= request.getServletContext().getRealPath("/")+"profile"+File.separator+user.getProfile();
-                out.println(path);
-                //Helper.deleteFile(path);
-                    if(Helper.saveFile(part.getInputStream(), path)){
-                        out.println("Profile updated");
-                    }
-                
-            }else{
-                out.println("Update Unsuccessful!");
-            }
-            
-            out.println("</body>");
-            out.println("</html>");
         }
     }
 
