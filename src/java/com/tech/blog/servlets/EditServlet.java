@@ -1,7 +1,7 @@
-
 package com.tech.blog.servlets;
 
 import com.tech.blog.dao.UserDao;
+import com.tech.blog.entities.Message;
 import com.tech.blog.entities.User;
 import com.tech.blog.helper.ConnectionProvider;
 import com.tech.blog.helper.Helper;
@@ -19,7 +19,6 @@ import java.io.File;
 @MultipartConfig
 public class EditServlet extends HttpServlet {
 
-   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -28,10 +27,10 @@ public class EditServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet EditServlet</title>");            
+            out.println("<title>Servlet EditServlet</title>");
             out.println("</head>");
             out.println("<body>");
-       
+
 //            fetch all data
             String userEmail = request.getParameter("user_email");
             String userName = request.getParameter("user_name");
@@ -39,33 +38,41 @@ public class EditServlet extends HttpServlet {
             //uploading img using servlet
             Part part = request.getPart("image");
             String imageName = part.getSubmittedFileName();
-            
+
             //get user from session
             HttpSession httpSession = request.getSession();
-           User user= (User) httpSession.getAttribute("currentUser");
-           
-           user.setName(userName);
-           user.setEmail(userEmail);
-           user.setPassword(userPassword);
-           user.setProfile(imageName);
-           
-           //update data in database
-           UserDao dao = new UserDao(ConnectionProvider.getConnection());
+            User user = (User) httpSession.getAttribute("currentUser");
+
+            user.setName(userName);
+            user.setEmail(userEmail);
+            user.setPassword(userPassword);
+            user.setProfile(imageName);
+
+            //update data in database
+            UserDao dao = new UserDao(ConnectionProvider.getConnection());
             boolean ans = dao.updateUser(user);
             if (ans) {
-                out.println("Update Successsfully");
-            
-                String path= request.getServletContext().getRealPath("/")+"profile"+File.separator+user.getProfile();
+
+                String path = request.getServletContext().getRealPath("/") + "profile" + File.separator + user.getProfile();
                 out.println(path);
                 //Helper.deleteFile(path);
-                    if(Helper.saveFile(part.getInputStream(), path)){
-                        out.println("Profile updated");
-                    }
-                
-            }else{
-                out.println("Update Unsuccessful!");
+                if (Helper.saveFile(part.getInputStream(), path)) {
+                    
+                    Message msg = new Message("Profile Updated ", "success", "alert-success");
+                    httpSession.setAttribute("msg", msg);
+                    
+                }else{
+                     Message msg = new Message("Something went wrong! ", "error", "alert-danger");
+                    httpSession.setAttribute("msg", msg);
+                }
+
+            } else {
+                 Message msg = new Message("Something went wrong! ", "error", "alert-danger");
+                    httpSession.setAttribute("msg", msg);
+                    
             }
-            
+            response.sendRedirect("profile.jsp");
+
             out.println("</body>");
             out.println("</html>");
         }

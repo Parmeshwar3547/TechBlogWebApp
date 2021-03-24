@@ -3,6 +3,7 @@
     Created on : 22-Mar-2021, 1:35:18 pm
     Author     : parme
 --%>
+<%@page import="com.tech.blog.entities.Message"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.tech.blog.entities.User" %>
 <%@page errorPage="error_page.jsp" %>
@@ -74,6 +75,18 @@
             </div>
         </nav>
         <!--navbar end-->
+           <%
+                               Message m= (Message) session.getAttribute("msg");
+                               if(m!=null){
+                                   %>
+                                   <div class="alert <%= m.getCssClass() %>" role="alert" style=" margin: 0;">
+                                       <%= m.getContent() %>
+                            </div>
+                                   <%
+                                       session.removeAttribute("msg");
+                               }
+
+                                %>
 
         <!--profile-modal-->
 
