@@ -3,6 +3,10 @@
     Created on : 22-Mar-2021, 1:35:18 pm
     Author     : parme
 --%>
+<%@page import="com.tech.blog.entities.Category"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.tech.blog.helper.ConnectionProvider"%>
+<%@page import="com.tech.blog.dao.PostDao"%>
 <%@page import="com.tech.blog.entities.Message"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.tech.blog.entities.User" %>
@@ -16,9 +20,11 @@
     }
 %>
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
         <title>Profile</title>
 
         <!--Bootstrap-->
@@ -61,6 +67,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#"><span class="fa fa-address-book-o"></span> Contact Us</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-toggle="modal" data-target="#add-post-modal"><span class="fa fa-edit"></span> Create Post</a>
+                    </li>
 
 
                 </ul>
@@ -75,18 +84,18 @@
             </div>
         </nav>
         <!--navbar end-->
-           <%
-                               Message m= (Message) session.getAttribute("msg");
-                               if(m!=null){
-                                   %>
-                                   <div class="alert <%= m.getCssClass() %>" role="alert" style=" margin: 0;">
-                                       <%= m.getContent() %>
-                            </div>
-                                   <%
-                                       session.removeAttribute("msg");
-                               }
+        <%
+            Message m = (Message) session.getAttribute("msg");
+            if (m != null) {
+        %>
+        <div class="alert <%= m.getCssClass()%>" role="alert" style=" margin: 0;">
+            <%= m.getContent()%>
+        </div>
+        <%
+                session.removeAttribute("msg");
+            }
 
-                                %>
+        %>
 
         <!--profile-modal-->
 
@@ -191,6 +200,65 @@
         <!--profile-modal end-->
 
 
+        <!--Add post modal-->
+        <div class="modal fade" id="add-post-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-psot-form" enctype="multipart/form-data" action="AddPostServlet" method="post">
+
+                            <div class="form-group">
+                                <select name="cid" class="form-control" id="inlineFormCustomSelect">
+                                    <option selected disabled  >---Category---</option>
+                                    <%
+                                        PostDao postd = new PostDao(ConnectionProvider.getConnection());
+                                        ArrayList<Category> list = postd.getCategorys();
+
+                                        for (Category c : list) {
+                                    %> 
+
+
+                                    <option value="<%= c.getCid()%>" > <%= c.getName()%></option>
+
+                                    <%
+                                        }
+                                    %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input name="pTitle" type="text" class="form-control" placeholder="Enter post title"/>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="pContent" class="form-control" placeholder="Enter your content" style="height:130px"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="pCode" class="form-control" placeholder="Write code(if any)" style="height:130px"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Photo: </label>
+                                <input name="pPic" type="file" class="form-control-file"/>
+                            </div>
+                                <div class="container text-center">
+                                    <button class="btn btn-outline-primary" type="submit">Post</button>
+                                </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--End post  modal-->
+
 
 
 
@@ -221,4 +289,35 @@
                 });
             });
         </script>
+        <script>
+//            now add post js
+            $(document).ready(function (e) {
+                $('#add-post-form').on("submit", function (event) {
+                    //this code call when form is submitted
+                   event.preventDefault();
+                   
+                   let form= FormData(this);
+                   
+                   //requesting to server
+                   $.ajax({
+                      url:"AddPostServlet",
+                      type:'post',
+                      data:form,
+                      success: function (data, textStatus, jqXHR) {
+                        //success
+                        console.log(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //error
+                    },
+                    processData: false,
+                    contentType: false
+                   });
+                });
+            });
+
+        </script>
+        
+        
+    </body>
 </html>
