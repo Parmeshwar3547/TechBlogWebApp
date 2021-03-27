@@ -9,6 +9,7 @@ import com.tech.blog.dao.PostDao;
 import com.tech.blog.entities.Post;
 import com.tech.blog.entities.User;
 import com.tech.blog.helper.ConnectionProvider;
+import com.tech.blog.helper.Helper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.io.File;
 
 /**
  *
@@ -57,6 +59,8 @@ public class AddPostServlet extends HttpServlet {
             
             if(dao.savePost(post)){
                 out.println("done");
+                 String path = request.getServletContext().getRealPath("/") + "blog_pics" + File.separator + imageName;
+                 Helper.saveFile(part.getInputStream(), path);
                 
             }else{
                 out.println("error");

@@ -24,7 +24,7 @@
 <html lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
+
         <title>Profile</title>
 
         <!--Bootstrap-->
@@ -211,7 +211,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="add-psot-form" enctype="multipart/form-data" action="AddPostServlet" method="post">
+                        <form id="add-post-form" enctype="multipart/form-data" action="AddPostServlet" method="post">
 
                             <div class="form-group">
                                 <select name="cid" class="form-control" id="inlineFormCustomSelect">
@@ -244,9 +244,9 @@
                                 <label>Select Photo: </label>
                                 <input name="pPic" type="file" class="form-control-file"/>
                             </div>
-                                <div class="container text-center">
-                                    <button class="btn btn-outline-primary" type="submit">Post</button>
-                                </div>
+                            <div class="container text-center">
+                                <button class="btn btn-outline-primary" type="submit">Post</button>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -294,30 +294,30 @@
             $(document).ready(function (e) {
                 $('#add-post-form').on("submit", function (event) {
                     //this code call when form is submitted
-                   event.preventDefault();
-                   
-                   let form= FormData(this);
-                   
-                   //requesting to server
-                   $.ajax({
-                      url:"AddPostServlet",
-                      type:'post',
-                      data:form,
-                      success: function (data, textStatus, jqXHR) {
-                        //success
-                        console.log(data);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        //error
-                    },
-                    processData: false,
-                    contentType: false
-                   });
+                    event.preventDefault();
+
+                    let form = new FormData(this);
+
+                    //requesting to server
+                    $.ajax({
+                        url: "AddPostServlet",
+                        type: 'post',
+                        data: form,
+                        success: function (data, textStatus, jqXHR) {
+                            //success
+                            console.log(data);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            //error
+                        },
+                        processData: false,
+                        contentType: false
+                    });
                 });
             });
 
         </script>
-        
-        
+
+
     </body>
 </html>
