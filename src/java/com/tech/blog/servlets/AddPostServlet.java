@@ -53,7 +53,7 @@ public class AddPostServlet extends HttpServlet {
             HttpSession session = request.getSession();
             User user=(User) session.getAttribute("currentUser");
             
-            Post post = new Post(pTitle, pContent, pCode, imageName, null, cid, user.getId());
+            Post post = new Post(pTitle, pContent, pCode, imageName, cid, user.getId());
             
             PostDao dao = new PostDao(ConnectionProvider.getConnection());
             

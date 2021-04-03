@@ -84,6 +84,57 @@
             </div>
         </nav>
         <!--navbar end-->
+        <!--Main body of the page-->
+        <main>
+            <div class="container">
+                <div class="row mt-4">
+                    <!--First col-->
+                    <div class="col-md-4">
+                        <!--Categories-->
+                        <div class="list-group">
+                            <a href="#" onclick="getPosts(0,this)" class=" c-link list-group-item list-group-item-action  primary-background">
+                                All Posts
+                            </a>
+                            <%
+                                PostDao pd = new PostDao(ConnectionProvider.getConnection());
+                                ArrayList<Category> list1 = pd.getCategorys();
+
+                                for (Category cc : list1) {
+                            %>
+                            <a href="#" onclick="getPosts(<%=cc.getCid() %>,this)" class=" c-link list-group-item list-group-item-action"><%=cc.getName()%></a> 
+                            <%
+                                }
+                            %>
+
+                        </div>
+                    </div>
+
+                    <!--second columns-->
+                    <div class="col-md-8" >
+                        <!--Posts-->
+                        <div class="container text-center " id="loader">
+                            <span class="fa fa-refresh fa-4x fa-spin "></span>
+                            <h4 class="mt-2">Loading...</h4>
+                        </div>
+                        <div class="container-fluid" id="post-container">
+                        
+                    </div>
+
+                    </div>
+                    
+                </div>
+
+            </div>
+
+
+        </main>
+
+
+
+
+
+
+        <!--End Main body-->
         <%
             Message m = (Message) session.getAttribute("msg");
             if (m != null) {
@@ -201,7 +252,7 @@
 
 
         <!--Add post modal-->
-        <div class="modal fade" id="add-post-modal" tabindex="-1" role="dialog">
+        <div class="modal fade " id="add-post-modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -249,10 +300,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -268,6 +316,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
         <script src="js/myjs.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
         <script>
             $(document).ready(function () {
                 let editStatus = false;
@@ -306,9 +355,15 @@
                         success: function (data, textStatus, jqXHR) {
                             //success
                             console.log(data);
+                            if (data.trim() === 'done') {
+                                swal("Good job!", "Saved Successfully", "success");
+                            } else {
+                                swal("Error!", "Something went wrong!", "error");
+                            }
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             //error
+                            swal("Error!", "Something went wrong!", "error");
                         },
                         processData: false,
                         contentType: false
@@ -317,7 +372,36 @@
             });
 
         </script>
-
-
+        
+            <!--Loading post using ajax-->
+        <script>
+            
+            function getPosts(catId,temp){
+                $("#loader").show();
+                $("#post-container").hide();
+                
+                $(".c-link").removeClass('primary-background');
+                
+                 $.ajax({
+                    url:"load_posts.jsp",
+                    data: {cid: catId},
+                    success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $("#loader").hide();
+                        $("#post-container").show();
+                        
+                        $("#post-container").html(data);
+                        
+                        $(temp).addClass('primary-background');
+                        
+                    }
+                });
+            }
+            $(document).ready(function (e){
+                let allPostRef= $('.c-link')[0];
+                
+               getPosts(0,allPostRef);
+            });
+        </script>
     </body>
 </html>
