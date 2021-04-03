@@ -92,7 +92,7 @@
                     <div class="col-md-4">
                         <!--Categories-->
                         <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action active primary-background">
+                            <a href="#" onclick="getPosts(0,this)" class=" c-link list-group-item list-group-item-action  primary-background">
                                 All Posts
                             </a>
                             <%
@@ -101,7 +101,7 @@
 
                                 for (Category cc : list1) {
                             %>
-                            <a href="#" class="list-group-item list-group-item-action"><%=cc.getName()%></a> 
+                            <a href="#" onclick="getPosts(<%=cc.getCid() %>,this)" class=" c-link list-group-item list-group-item-action"><%=cc.getName()%></a> 
                             <%
                                 }
                             %>
@@ -113,7 +113,7 @@
                     <div class="col-md-8" >
                         <!--Posts-->
                         <div class="container text-center " id="loader">
-                            <span class="fa fa-refresh fa-4x"></span>
+                            <span class="fa fa-refresh fa-4x fa-spin "></span>
                             <h4 class="mt-2">Loading...</h4>
                         </div>
                         <div class="container-fluid" id="post-container">
@@ -375,16 +375,32 @@
         
             <!--Loading post using ajax-->
         <script>
-            $(document).ready(function (e){
-                $.ajax({
+            
+            function getPosts(catId,temp){
+                $("#loader").show();
+                $("#post-container").hide();
+                
+                $(".c-link").removeClass('primary-background');
+                
+                 $.ajax({
                     url:"load_posts.jsp",
+                    data: {cid: catId},
                     success: function (data, textStatus, jqXHR) {
                         console.log(data);
                         $("#loader").hide();
+                        $("#post-container").show();
+                        
                         $("#post-container").html(data);
+                        
+                        $(temp).addClass('primary-background');
                         
                     }
                 });
+            }
+            $(document).ready(function (e){
+                let allPostRef= $('.c-link')[0];
+                
+               getPosts(0,allPostRef);
             });
         </script>
     </body>
